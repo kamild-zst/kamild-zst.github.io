@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python — Kurs od podstaw</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --bg2: #13161e;
+    --bg3: #1a1e2a;
+    --card: #181c26;
+    --border: #252a38;
+    --accent: #f5a623;
+    --accent2: #e06c3a;
+    --green: #5ecf8e;
+    --blue: #61a8f5;
+    --purple: #b48ef5;
+    --red: #f56161;
+    --text: #d4d8e8;
+    --text-dim: #7a8099;
+    --text-bright: #eef0f8;
+    --code-bg: #0a0c12;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Lora', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.8;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE TEXTURE ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: .4;
+  }
+
+  /* ── SIDEBAR NAV ── */
+  .sidebar {
+    position: fixed;
+    left: 0; top: 0; bottom: 0;
+    width: 260px;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    padding: 32px 0;
+    overflow-y: auto;
+    z-index: 100;
+    transform: translateX(0);
+    transition: transform .3s;
+  }
+
+  .sidebar-logo {
+    padding: 0 24px 28px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+
+  .sidebar-logo .py-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--text-bright);
+    letter-spacing: -0.5px;
+  }
+
+  .py-badge span {
+    background: var(--accent);
+    color: #000;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 800;
+  }
+
+  .sidebar-logo p {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 6px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .nav-section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    padding: 16px 24px 6px;
+  }
+
+  .sidebar a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 24px;
+    color: var(--text-dim);
+    text-decoration: none;
+    font-family: 'Syne', sans-serif;
+    font-size: 13.5px;
+    font-weight: 600;
+    transition: all .15s;
+    border-left: 3px solid transparent;
+  }
+
+  .sidebar a:hover, .sidebar a.active {
+    color: var(--accent);
+    background: rgba(245,166,35,.06);
+    border-left-color: var(--accent);
+  }
+
+  .sidebar a .icon { font-size: 15px; opacity: .7; }
+
+  /* ── MAIN ── */
+  .main {
+    margin-left: 260px;
+    min-height: 100vh;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, #0d0f14 0%, #111420 40%, #0f1520 100%);
+    padding: 90px 80px 80px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: 'Python';
+    position: absolute;
+    right: -20px; top: -30px;
+    font-family: 'Syne', sans-serif;
+    font-size: 200px;
+    font-weight: 800;
+    color: rgba(245,166,35,.04);
+    pointer-events: none;
+    letter-spacing: -5px;
+  }
+
+  .hero-tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid rgba(245,166,35,.3);
+    padding: 4px 12px;
+    border-radius: 2px;
+    margin-bottom: 20px;
+    animation: fadeUp .6s ease both;
+  }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(40px, 5vw, 64px);
+    font-weight: 800;
+    color: var(--text-bright);
+    line-height: 1.05;
+    letter-spacing: -2px;
+    margin-bottom: 16px;
+    animation: fadeUp .6s .1s ease both;
+  }
+
+  .hero h1 em {
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  .hero p {
+    max-width: 540px;
+    color: var(--text-dim);
+    font-size: 16px;
+    animation: fadeUp .6s .2s ease both;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 40px;
+    margin-top: 40px;
+    animation: fadeUp .6s .3s ease both;
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .stat-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--accent);
+  }
+
+  .stat-lbl {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* ── CONTENT AREA ── */
+  .content {
+    padding: 0 80px 100px;
+    max-width: 1000px;
+  }
+
+  /* ── CHAPTER HEADER ── */
+  .chapter {
+    padding-top: 70px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 40px;
+    display: flex;
+    align-items: flex-end;
+    gap: 20px;
+  }
+
+  .chapter-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    margin-bottom: 8px;
+  }
+
+  .chapter h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(26px, 3vw, 36px);
+    font-weight: 800;
+    color: var(--text-bright);
+    letter-spacing: -1px;
+    line-height: 1.1;
+  }
+
+  /* ── SECTION ── */
+  .section {
+    margin-bottom: 48px;
+  }
+
+  .section h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-bright);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section h3::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 20px;
+    background: var(--accent);
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .section h4 {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--accent2);
+    margin: 22px 0 8px;
+    letter-spacing: .3px;
+  }
+
+  p { margin-bottom: 14px; }
+
+  /* ── CODE BLOCK ── */
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin: 18px 0;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: rgba(255,255,255,.03);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .code-dots {
+    display: flex;
+    gap: 6px;
+  }
+
+  .code-dots span {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+
+  .code-dots span:nth-child(1) { background: #f56161; }
+  .code-dots span:nth-child(2) { background: var(--accent); }
+  .code-dots span:nth-child(3) { background: var(--green); }
+
+  .code-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .code-block pre {
+    padding: 20px 22px;
+    overflow-x: auto;
+    font-family: 'DM Mono', monospace;
+    font-size: 13.5px;
+    line-height: 1.75;
+  }
+
+  /* Syntax highlight classes */
+  .kw  { color: #b48ef5; }   /* keyword */
+  .fn  { color: #61a8f5; }   /* function */
+  .st  { color: #5ecf8e; }   /* string */
+  .nm  { color: #f5a623; }   /* number */
+  .cm  { color: #4a5270; font-style: italic; } /* comment */
+  .op  { color: #e06c3a; }   /* operator */
+  .var { color: #d4d8e8; }   /* variable */
+  .bo  { color: #f5617e; }   /* bool */
+
+  /* ── OUTPUT BLOCK ── */
+  .output {
+    background: rgba(94,207,142,.05);
+    border: 1px solid rgba(94,207,142,.2);
+    border-left: 3px solid var(--green);
+    border-radius: 0 8px 8px 0;
+    padding: 12px 18px;
+    margin: -8px 0 18px;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--green);
+  }
+
+  .output::before {
+    content: '▶ Wynik:';
+    display: block;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    opacity: .6;
+    margin-bottom: 4px;
+  }
+
+  /* ── INFO BOX ── */
+  .info-box {
+    background: rgba(97,168,245,.07);
+    border: 1px solid rgba(97,168,245,.25);
+    border-left: 3px solid var(--blue);
+    border-radius: 0 8px 8px 0;
+    padding: 14px 18px;
+    margin: 18px 0;
+    font-size: 15px;
+  }
+
+  .info-box strong {
+    color: var(--blue);
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    letter-spacing: .5px;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  /* ── WARN BOX ── */
+  .warn-box {
+    background: rgba(245,97,97,.07);
+    border: 1px solid rgba(245,97,97,.25);
+    border-left: 3px solid var(--red);
+    border-radius: 0 8px 8px 0;
+    padding: 14px 18px;
+    margin: 18px 0;
+    font-size: 15px;
+  }
+
+  .warn-box strong {
+    color: var(--red);
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    letter-spacing: .5px;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  /* ── OPERATOR TABLE ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 18px 0;
+    font-size: 14px;
+  }
+
+  th {
+    background: rgba(245,166,35,.1);
+    color: var(--accent);
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    text-align: left;
+    border: 1px solid var(--border);
+  }
+
+  td {
+    padding: 9px 14px;
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    vertical-align: top;
+  }
+
+  tr:nth-child(even) td { background: rgba(255,255,255,.02); }
+  tr:hover td { background: rgba(245,166,35,.04); }
+
+  td.desc { font-family: 'Lora', serif; font-size: 14px; }
+
+  /* ── TAG PILL ── */
+  .tag {
+    display: inline-block;
+    background: rgba(180,142,245,.15);
+    color: var(--purple);
+    border: 1px solid rgba(180,142,245,.3);
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    margin: 2px;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+    margin: 40px 0;
+    opacity: .3;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg2); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* ── MOBILE ── */
+  @media (max-width: 900px) {
+    .sidebar { width: 220px; transform: translateX(-220px); }
+    .sidebar.open { transform: translateX(0); }
+    .main { margin-left: 0; }
+    .hero, .content { padding-left: 24px; padding-right: 24px; }
+    .hero::before { display: none; }
+    .hero-stats { flex-wrap: wrap; gap: 24px; }
+    table { display: block; overflow-x: auto; }
+    .menu-btn {
+      display: flex !important;
+      position: fixed; top: 16px; left: 16px; z-index: 200;
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px; cursor: pointer;
+      flex-direction: column; gap: 4px;
+    }
+    .menu-btn span { display: block; width: 20px; height: 2px; background: var(--text); border-radius: 1px; }
+  }
+
+  .menu-btn { display: none; }
+</style>
+</head>
+<body>
+
+<button class="menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')" aria-label="Menu">
+  <span></span><span></span><span></span>
+</button>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="py-badge"><span>py</span> Kurs</div>
+    <p>Od zera do bohatera</p>
+  </div>
+
+  <div class="nav-section-label">Rozdziały</div>
+  <a href="#zmienne" class="active"><span class="icon">📦</span> Zmienne i typy</a>
+  <a href="#operatory"><span class="icon">⚙️</span> Operatory</a>
+  <a href="#warunki"><span class="icon">🔀</span> Instrukcje warunkowe</a>
+  <a href="#petle"><span class="icon">🔁</span> Pętle for / while</a>
+  <a href="#funkcje"><span class="icon">🧩</span> Funkcje</a>
+  <a href="#listy"><span class="icon">📋</span> Listy (tablice)</a>
+  <a href="#math"><span class="icon">🔢</span> Funkcje matematyczne</a>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-tag">Kompletny kurs · Python 3</div>
+    <h1>Naucz się <em>Pythona</em><br>od podstaw.</h1>
+    <p>Teoria, przykłady, wyniki — wszystko w jednym miejscu. Przejdź przez każdy temat krok po kroku i zacznij pisać własny kod już dziś.</p>
+    <div class="hero-stats">
+      <div class="stat"><span class="stat-num">7</span><span class="stat-lbl">Rozdziałów</span></div>
+      <div class="stat"><span class="stat-num">60+</span><span class="stat-lbl">Przykładów</span></div>
+      <div class="stat"><span class="stat-num">0</span><span class="stat-lbl">Wymaganej wiedzy</span></div>
+    </div>
+  </section>
+
+  <div class="content">
+
+<!-- ══════════════════════════════════════════
+     ROZDZIAŁ 1 — ZMIENNE I TYPY
+══════════════════════════════════════════ -->
+<div id="zmienne">
+  <div class="chapter">
+    <div>
+      <div class="chapter-num">Rozdział 01</div>
+      <h2>Zmienne i typy danych</h2>
+    </div>
+  </div>
+
+  <div class="section">
+    <p>Zmienna to nazwane miejsce w pamięci komputera, w którym przechowujesz dane. W Pythonie nie musisz deklarować typu — interpreter sam go wykryje.</p>
+
+    <div class="info-box">
+      <strong>💡 Zasada</strong>
+      Python jest <em>dynamicznie typowany</em> — typ zmiennej zależy od wartości, którą do niej przypisujesz.
+    </div>
+
+    <h3>Podstawowe typy danych</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-label">Python 3</span>
+      </div>
+      <pre><span class="cm"># --- Liczby całkowite (int) ---</span>
+<span class="var">wiek</span>        <span class="op">=</span> <span class="nm">21</span>
+<span class="var">rok</span>         <span class="op">=</span> <span class="nm">2024</span>
+<span class="var">temperatura</span> <span class="op">=</span> <span class="op">-</span><span class="nm">7</span>
+
+<span class="cm"># --- Liczby zmiennoprzecinkowe (float) ---</span>
+<span class="var">pi</span>     <span class="op">=</span> <span class="nm">3.14159</span>
+<span class="var">cena</span>   <span class="op">=</span> <span class="nm">49.99</span>
+<span class="var">wynik</span>  <span class="op">=</span> <span class="nm">1_000_000.5</span>   <span class="cm"># _ jako separator (czytelność)</span>
+
+<span class="cm"># --- Łańcuchy znaków (str) ---</span>
+<span class="var">imie</span>      <span class="op">=</span> <span class="st">"Anna"</span>
+<span class="var">pozdrowienie</span> <span class="op">=</span> <span class="st">'Cześć, świecie!'</span>
+<span class="var">wielolinia</span>   <span class="op">=</span> <span class="st">"""To jest
+tekst w wielu
+liniach."""</span>
+
+<span class="cm"># --- Wartości logiczne (bool) ---</span>
+<span class="var">jest_aktywny</span> <span class="op">=</span> <span class="bo">True</span>
+<span class="var">jest_admin</span>   <span class="op">=</span> <span class="bo">False</span>
+
+<span class="cm"># --- Brak wartości (NoneType) ---</span>
+<span class="var">wynik_bledu</span>  <span class="op">=</span> <span class="bo">None</span>
+
+<span class="cm"># Sprawdzenie typu:</span>
+<span class="fn">print</span>(<span class="fn">type</span>(<span class="var">wiek</span>))          <span class="cm"># &lt;class 'int'&gt;</span>
+<span class="fn">print</span>(<span class="fn">type</span>(<span class="var">pi</span>))           <span class="cm"># &lt;class 'float'&gt;</span>
+<span class="fn">print</span>(<span class="fn">type</span>(<span class="var">imie</span>))         <span class="cm"># &lt;class 'str'&gt;</span>
+<span class="fn">print</span>(<span class="fn">type</span>(<span class="var">jest_aktywny</span>)) <span class="cm"># &lt;class 'bool'&gt;</span></pre>
+    </div>
+
+    <h3>Wypisywanie zmiennych — print()</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-label">Python 3</span>
+      </div>
+      <pre><span class="var">imie</span> <span class="op">=</span> <span class="st">"Kasia"</span>
+<span class="var">wiek</span> <span class="op">=</span> <span class="nm">25</span>
+
+<span class="cm"># Sposób 1 — f-string (zalecany, Python 3.6+)</span>
+<span class="fn">print</span>(<span class="st">f"Hej, {imie}! Masz {wiek} lat."</span>)
+
+<span class="cm"># Sposób 2 — format()</span>
+<span class="fn">print</span>(<span class="st">"Hej, {}! Masz {} lat."</span>.<span class="fn">format</span>(<span class="var">imie</span>, <span class="var">wiek</span>))
+
+<span class="cm"># Sposób 3 — konkatenacja</span>
+<span class="fn">print</span>(<span class="st">"Hej, "</span> <span class="op">+</span> <span class="var">imie</span> <span class="op">+</span> <span class="st">"!"</span>)
+
+<span class="cm"># Wbudowane formatowanie f-stringa</span>
+<span class="var">liczba</span> <span class="op">=</span> <span class="nm">3.14159</span>
+<span class="fn">print</span>(<span class="st">f"Pi ≈ {liczba:.2f}"</span>)   <span class="cm"># 2 miejsca po przecinku</span>
+<span class="fn">print</span>(<span class="st">f"Pi ≈ {liczba:.4f}"</span>)   <span class="cm"># 4 miejsca po przecinku</span></pre>
+    </div>
+    <div class="output">Hej, Kasia! Masz 25 lat.<br>Hej, Kasia! Masz 25 lat.<br>Hej, Kasia!<br>Pi ≈ 3.14<br>Pi ≈ 3.1416</div>
+
+    <h3>Konwersja typów (casting)</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-label">Python 3</span>
+      </div>
+      <pre><span class="var">tekst</span>  <span class="op">=</span> <span class="st">"42"</span>
+<span class="var">liczba</span> <span class="op">=</span> <span class="fn">int</span>(<span class="var">tekst</span>)     <span class="cm"># "42" → 42</span>
+<span class="var">pienny</span> <span class="op">=</span> <span class="fn">float</span>(<span class="var">tekst</span>)   <span class="cm"># "42" → 42.0</span>
+<span class="var">z_pow</span>  <span class="op">=</span> <span class="fn">str</span>(<span class="nm">100</span>)        <span class="cm"># 100  → "100"</span>
+
+<span class="fn">print</span>(<span class="var">liczba</span> <span class="op">+</span> <span class="nm">8</span>)   <span class="cm"># 50</span>
+<span class="fn">print</span>(<span class="var">pienny</span>)       <span class="cm"># 42.0</span>
+<span class="fn">print</span>(<span class="var">z_pow</span> <span class="op">+</span> <span class="st">" zł"</span>) <span class="cm"># 100 zł</span></pre>
+    </div>
+    <div class="output">50<br>42.0<br>100 zł</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     ROZDZIAŁ 2 — OPERATORY
+══════════════════════════════════════════ -->
+<div id="operatory">
+  <div class="chapter">
+    <div>
+      <div class="chapter-num">Rozdział 02</div>
+      <h2>Operatory</h2>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Operatory arytmetyczne</h3>
+    <table>
+      <tr><th>Operator</th><th>Nazwa</th><th>Przykład</th><th>Wynik</th></tr>
+      <tr><td>+</td><td class="desc">Dodawanie</td><td>10 + 3</td><td>13</td></tr>
+      <tr><td>-</td><td class="desc">Odejmowanie</td><td>10 - 3</td><td>7</td></tr>
+      <tr><td>*</td><td class="desc">Mnożenie</td><td>10 * 3</td><td>30</td></tr>
+      <tr><td>/</td><td class="desc">Dzielenie (float)</td><td>10 / 3</td><td>3.333…</td></tr>
+      <tr><td>//</td><td class="desc">Dzielenie całkowite</td><td>10 // 3</td><td>3</td></tr>
+      <tr><td>%</td><td class="desc">Reszta z dzielenia</td><td>10 % 3</td><td>1</td></tr>
+      <tr><td>**</td><td class="desc">Potęgowanie</td><td>2 ** 8</td><td>256</td></tr>
+    </table>
+
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-label">Operatory arytmetyczne</span>
+      </div>
+      <pre><span class="var">a</span> <span class="op">=</span> <span class="nm">17</span>
+<span class="var">b</span> <span class="op">=</span> <span class="nm">5</span>
+
+<span class="fn">print</span>(<span class="st">f"Suma:              {a} + {b} = {a <span class="op">+</span> b}"</span>)
+<span class="fn">print</span>(<span class="st">f"Różnica:           {a} - {b} = {a <span class="op">-</span> b}"</span>)
+<span class="fn">print</span>(<span class="st">f"Iloczyn:           {a} * {b} = {a <span class="op">*</span> b}"</span>)
+<span class="fn">print</span>(<span class="st">f"Dzielenie:         {a} / {b} = {a <span class="op">/</span> b}"</span>)
+<span class="fn">print</span>(<span class="st">f"Dziel. całkowite:  {a} // {b} = {a <span class="op">//</span> b}"</span>)
+<span class="fn">print</span>(<span class="st">f"Reszta (modulo):   {a} % {b}  = {a <span class="op">%</span> b}"</span>)
+<span class="fn">print</span>(<span class="st">f"Potęga:            {a} ** 2  = {a <span class="op">**</span> 2}"</span>)
+
+<span class="cm"># Praktyczne zastosowanie modulo:</span>
+<span class="fn">print</span>(<span class="st">f"Czy {a} jest parzyste? {a <span class="op">%</span> 2 == 0}"</span>)  <span class="cm"># False</span>
+<span class="fn">print</span>(<span class="st">f"Czy {b} jest parzyste? {b <span class="op">%</span> 2 == 0}"</span>)  <span class="cm"># False (5 nieparzyste)</span></pre>
+    </div>
+    <div class="output">Suma:              17 + 5 = 22<br>Różnica:           17 - 5 = 12<br>Iloczyn:           17 * 5 = 85<br>Dzielenie:         17 / 5 = 3.4<br>Dziel. całkowite:  17 // 5 = 3<br>Reszta (modulo):   17 % 5  = 2<br>Potęga:            17 ** 2  = 289<br>Czy 17 jest parzyste? False<br>Czy 5 jest parzyste? False</div>
+
+    <h3>Operatory porównania</h3>
+    <table>
+      <tr><th>Operator</th><th>Znaczenie</th><th>Przykład</th><th>Wynik</th></tr>
+      <tr><td>==</td><td class="desc">Równy</td><td>5 == 5</td><td>True</td></tr>
+      <tr><td>!=</td><td class="desc">Różny</td><td>5 != 3</td><td>True</td></tr>
+      <tr><td>&gt;</td><td class="desc">Większy</td><td>7 &gt; 3</td><td>True</td></tr>
+      <tr><td>&lt;</td><td class="desc">Mniejszy</td><td>3 &lt; 7</td><td>True</td></tr>
+      <tr><td>&gt;=</td><td class="desc">Większy lub równy</td><td>5 &gt;= 5</td><td>True</td></tr>
+      <tr><td>&lt;=</td><td class="desc">Mniejszy lub równy</td><td>4 &lt;= 3</td><td>False</td></tr>
+    </table>
+
+    <h3>Operatory logiczne</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-label">and / or / not</span>
+      </div>
+      <pre><span class="var">x</span> <span class="op">=</span> <span class="nm">10</span>
+
+<span class="cm"># and — oba warunki muszą być True</span>
+<span class="fn">print</span>(<span class="var">x</span> <span class="op">></span> <span class="nm">5</span> <span class="kw">and</span> <span class="var">x</span> <span class="op"><</span> <span class="nm">20</span>)   <span class="cm"># True</span>
+<span class="fn">print</span>(<span class="var">x</span> <span class="op">></span> <span class="nm">5</span> <span class="kw">and</span> <span class="var">x</span> <span class="op">></span> <span class="nm">50</span>)   <span class="cm"># False</span>
+
+<span class="cm"># or — wystarczy jeden True</span>
+<span class="fn">print</span>(<span class="var">x</span> <span class="op">></span> <span class="nm">50</span> <span class="kw">or</span> <span class="var">x</span> <span class="op">==</span> <span class="nm">10</span>)  <span class="cm"># True</span>
+<span class="fn">print</span>(<span class="var">x</span> <span class="op">></span> <span class="nm">50</span> <span class="kw">or</span> <span class="var">x</span> <span class="op"><</span> <span class="nm">0</span>)   <span class="cm"># False</span>
+
+<span class="cm"># not — odwraca wartość</span>
+<span class="fn">print</span>(<span class="kw">not</span> (<span class="var">x</span> <span class="op">==</span> <span class="nm">10</span>))       <span class="cm"># False</span>
+<span class="fn">print</span>(<span class="kw">not</span> (<span class="var">x</span> <span class="op">></span> <span class="nm">100</span>))       <span class="cm"># True</span></pre>
+    </div>
+    <div class="output">True<br>False<br>True<br>False<br>False<br>True</div>
+
+    <h3>Operatory przypisania skróconego</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-label">Augmented assignment</span>
+      </div>
+      <pre><span class="var">n</span> <span class="op">=</span> <span class="nm">10</span>
+<span class="var">n</span> <span class="op">+=</span> <span class="nm">5</span>   <span class="cm"># n = n + 5  → 15</span>
+<span class="var">n</span> <span class="op">-=</span> <span class="nm">3</span>   <span class="cm"># n = n - 3  → 12</span>
+<span class="var">n</span> <span class="op">*=</span> <span class="nm">2</span>   <span class="cm"># n = n * 2  → 24</span>
+<span class="var">n</span> <span class="op">//=</span> <span class="nm">4</span>  <span class="cm"># n = n // 4 → 6</span>
+<span class="var">n</span> <span class="op">**=</span> <span class="nm">2</span>  <span class="cm"># n = n ** 2 → 36</span>
+<span class="var">n</span> <span class="op">%=</span> <span class="nm">10</span>  <span class="cm"># n = n % 10 → 6</span>
+<span class="fn">print</span>(<span class="var">n</span>)  <span class="cm"># 6</span></pre>
+    </div>
+    <div class="output">6</div>
+
+    <h3>Operatory bitowe</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-label">Bitowe (zaawansowane)</span>
+      </div>
+      <pre><span class="var">a</span> <span class="op">=</span> <span class="nm">0b1010</span>  <span class="cm"># 10 w binarnym</span>
+<span class="var">b</span> <span class="op">=</span> <span class="nm">0b1100</span>  <span class="cm"># 12 w binarnym</span>
+
+<span class="fn">print</span>(<span class="fn">bin</span>(<span class="var">a</span> <span class="op">&amp;</span> <span class="var">b</span>))   <span class="cm"># AND bitowy → 0b1000 (8)</span>
+<span class="fn">print</span>(<span class="fn">bin</span>(<span class="var">a</span> <span class="op">|</span> <span class="var">b</span>))   <span class="cm"># OR  bitowy → 0b1110 (14)</span>
+<span class="fn">print</span>(<span class="fn">bin</span>(<span class="var">a</span> <span class="op">^</span> <span class="var">b</span>))   <span class="cm"># XOR bitowy → 0b0110 (6)</span>
+<span class="fn">print</span>(<span class="fn">bin</span>(<span class="op">~</span><span class="var">a</span>))       <span class="cm"># NOT bitowy → -11</span>
+<span class="fn">print</span>(<span class="nm">4</span> <span class="op">&lt;&lt;</span> <span class="nm">1</span>)        <span class="cm"># przesuń w lewo → 8</span>
+<span class="fn">print</span>(<span class="nm">16</span> <span class="op">&gt;&gt;</span> <span class="nm">2</span>)       <span class="cm"># przesuń w prawo → 4</span></pre>
+    </div>
+    <div class="output">0b1000<br>0b1110<br>0b110<br>-0b1011<br>8<br>4</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     ROZDZIAŁ 3 — INSTRUKCJE WARUNKOWE
+══════════════════════════════════════════ -->
+<div id="warunki">
+  <div class="chapter">
+    <div>
+      <div class="chapter-num">Rozdział 03</div>
+      <h2>Instrukcje warunkowe</h2>
+    </div>
+  </div>
+
+  <div class="section">
+    <p>Instrukcje warunkowe pozwalają programowi podejmować decyzje — wykonywać różny kod w zależności od spełnienia warunków.</p>
+
+    <h3>Podstawowe if / elif / else</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-label">Przykład 1 — oceny</span>
+      </div>
+      <pre><span class="var">punkty</span> <span class="op">=</span> <span class="nm">78</span>
+
+<span class="kw">if</span> <span class="var">punkty</span> <span class="op">>=</span> <span class="nm">90</span>:
+    <span class="fn">print</span>(<span class="st">"Ocena: 5 — Celujący! 🏆"</span>)
+<span class="kw">elif</span> <span class="var">punkty</span> <span class="op">>=</span> <span class="nm">80</span>:
+    <span class="fn">print</span>(<span class="st">"Ocena: 4 — Bardzo dobry"</span>)
+<span class="kw">elif</span> <span class="var">punkty</span> <span class="op">>=</span> <span class="nm">70</span>:
+    <span class="fn">print</span>(<span class="st">"Ocena: 3 — Dobry"</span>)
+<span class="kw">elif</span> <span class="var">punkty</span> <span class="op">>=</span> <span class="nm">60</span>:
+    <span class="fn">print</span>(<span class="st">"Ocena: 2 — Dostateczny"</span>)
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="st">"Ocena: 1 — Niedostateczny"</span>)</pre>
+    </div>
+    <div class="output">Ocena: 3 — Dobry</div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-label">Przykład 2 — sprawdzenie liczby</span>
+      </div>
+      <pre><span class="var">liczba</span> <span class="op">=</span> <span class="nm">-5</span>
+
+<span class="kw">if</span> <span class="var">liczba</span> <span class="op">></span> <span class="nm">0</span>:
+    <span class="fn">print</span>(<span class="st">"Liczba jest dodatnia"</span>)
+<span class="kw">elif</span> <span class="var">liczba</span> <span class="op"><</span> <span class="nm">0</span>:
+    <span class="fn">print</span>(<span class="st">"Liczba jest ujemna"</span>)
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="st">"To jest zero"</span>)</pre>
+    </div>
+    <div class="output">Liczba jest ujemna</div>
+
+    <h3>Zagnieżdżone warunki</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-label">Przykład 3 — wejście na imprezę</span>
+      </div>
+      <pre><span class="var">wiek</span>        <span class="op">=</span> <span class="nm">20</span>
+<span class="var">ma_zaproszenie</span> <span class="op">=</span> <span class="bo">True</span>
+
+<span class="kw">if</span> <span class="var">wiek</span> <span class="op">>=</span> <span class="nm">18</span>:
+    <span class="kw">if</span> <span class="var">ma_zaproszenie</span>:
+        <span class="fn">print</span>(<span class="st">"Wejście dozwolone! 🎉"</span>)
+    <span class="kw">else</span>:
+        <span class="fn">print</span>(<span class="st">"Brak zaproszenia — nie wchodzisz."</span>)
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="st">"Jesteś niepełnoletni — wstęp wzbroniony."</span>)</pre>
+    </div>
+    <div class="output">Wejście dozwolone! 🎉</div>
+
+    <h3>Warunki złożone z and / or</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-label">Przykład 4 — sklep z alkoholem</span>
+      </div>
+      <pre><span class="var">wiek</span>    <span class="op">=</span> <span class="nm">17</span>
+<span class="var">kraj</span>    <span class="op">=</span> <span class="st">"PL"</span>
+<span class="var">z_opiekunem</span> <span class="op">=</span> <span class="bo">False</span>
+
+<span class="kw">if</span> (<span class="var">kraj</span> <span class="op">==</span> <span class="st">"PL"</span> <span class="kw">and</span> <span class="var">wiek</span> <span class="op">>=</span> <span class="nm">18</span>) <span class="kw">or</span> \
+   (<span class="var">kraj</span> <span class="op">==</span> <span class="st">"DE"</span> <span class="kw">and</span> <span class="var">wiek</span> <span class="op">>=</span> <span class="nm">16</span> <span class="kw">and</span> <span class="var">z_opiekunem</span>):
+    <span class="fn">print</span>(<span class="st">"Sprzedaż możliwa"</span>)
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="st">"Brak zgody na sprzedaż"</span>)</pre>
+    </div>
+    <div class="output">Brak zgody na sprzedaż</div>
+
+    <h3>Sprawdzanie przynależności (in)</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-label">Przykład 6 — operator in</span>
+      </div>
+      <pre><span class="var">owoce</span>     <span class="op">=</span> [<span class="st">"jabłko"</span>, <span class="st">"banan"</span>, <span class="st">"wiśnia"</span>]
+<span class="var">szukany</span>  <span class="op">=</span> <span class="st">"banan"</span>
+
+<span class="kw">if</span> <span class="var">szukany</span> <span class="kw">in</span> <span class="var">owoce</span>:
+    <span class="fn">print</span>(<span class="st">f"{szukany} jest na liście 🍌"</span>)
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="st">f"{szukany} nie znaleziono"</span>)
+
+<span class="cm"># Sprawdzanie ciągu znaków</span>
+<span class="var">haslo</span> <span class="op">=</span> <span class="st">"SuperHasło123"</span>
+<span class="kw">if</span> <span class="st">"123"</span> <span class="kw">in</span> <span class="var">haslo</span>:
+    <span class="fn">print</span>(<span class="st">"Hasło zawiera cyfry — dodaj znaki specjalne!"</span>)</pre>
+    </div>
+    <div class="output">banan jest na liście 🍌<br>Hasło zawiera cyfry — dodaj znaki specjalne!</div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     ROZDZIAŁ 4 — PĘTLE
+══════════════════════════════════════════ -->
+<div id="petle">
+  <div class="chapter">
+    <div>
+      <div class="chapter-num">Rozdział 04</div>
+      <h2>Pętle for i while</h2>
+    </div>
+  </div>
+
+  <div class="section">
+    <p>Pętle pozwalają powtarzać bloki kodu — bez pisania tego samego dziesiątki razy. <strong>for</strong> iteruje po sekwencjach, <strong>while</strong> działa, dopóki warunek jest spełniony.</p>
+
+    <h3>Pętla for — range()</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-label">Przykład 1 — range()</span>
+      </div>
+      <pre><span class="cm"># range(stop) — od 0 do stop-1</span>
+<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">5</span>):
+    <span class="fn">print</span>(<span class="st">f"i = {i}"</span>)
+
+<span class="fn">print</span>(<span class="st">"---"</span>)
+
+<span class="cm"># range(start, stop) — od start do stop-1</span>
+<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">1</span>, <span class="nm">6</span>):
+    <span class="fn">print</span>(<span class="st">f"  liczba: {i}"</span>)
+
+<span class="fn">print</span>(<span class="st">"---"</span>)
+
+<span class="cm"># range(start, stop, step) — co krok</span>
+<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">0</span>, <span class="nm">20</span>, <span class="nm">4</span>):
+    <span class="fn">print</span>(<span class="st">f"  krok 4: {i}"</span>)
+
+<span class="fn">print</span>(<span class="st">"---"</span>)
+
+<span class="cm"># Odliczanie wstecz</span>
+<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">5</span>, <span class="nm">0</span>, <span class="op">-</span><span class="nm">1</span>):
+    <span class="fn">print</span>(<span class="st">f"  start: {i}"</span>)</pre>
+    </div>
+    <div class="output">i = 0<br>i = 1<br>i = 2<br>i = 3<br>i = 4<br>---<br>  liczba: 1 … 5<br>---<br>  krok 4: 0, 4, 8, 12, 16<br>---<br>  start: 5, 4, 3, 2, 1</div>
+
+    <h3>Pętla for — iteracja po liście</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-label">Przykład 2 — lista, enumerate, zip</span>
+      </div>
+      <pre><span class="var">owoce</span> <span class="op">=</span> [<span class="st">"jabłko"</span>, <span class="st">"banan"</span>, <span class="st">"wiśnia"</span>, <span class="st">"mango"</span>]
+
+<span class="cm"># Prosta iteracja</span>
+<span class="kw">for</span> <span class="var">owoc</span> <span class="kw">in</span> <span class="var">owoce</span>:
+    <span class="fn">print</span>(<span class="st">f"  🍓 {owoc}"</span>)
+
+<span class="fn">print</span>(<span class="st">"---"</span>)
+
+<span class="cm"># enumerate — indeks + wartość</span>
+<span class="kw">for</span> <span class="var">idx</span>, <span class="var">owoc</span> <span class="kw">in</span> <span class="fn">enumerate</span>(<span class="var">owoce</span>, <span class="nm">1</span>):
+    <span class="fn">print</span>(<span class="st">f"  {idx}. {owoc}"</span>)
+
+<span class="fn">print</span>(<span class="st">"---"</span>)
+
+<span class="cm"># zip — dwie listy jednocześnie</span>
+<span class="var">ceny</span> <span class="op">=</span> [<span class="nm">2.99</span>, <span class="nm">1.49</span>, <span class="nm">4.99</span>, <span class="nm">8.99</span>]
+<span class="kw">for</span> <span class="var">owoc</span>, <span class="var">cena</span> <span class="kw">in</span> <span class="fn">zip</span>(<span class="var">owoce</span>, <span class="var">ceny</span>):
+    <span class="fn">print</span>(<span class="st">f"  {owoc:<span class="nm">10</span>} → {cena} zł"</span>)</pre>
+    </div>
+    <div class="output">  🍓 jabłko …<br>---<br>  1. jabłko<br>  2. banan …<br>---<br>  jabłko     → 2.99 zł<br>  banan      → 1.49 zł …</div>
+
+    <h3>Pętla for — obliczenia na liście</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-label">Przykład 3 — sumy, średnie, filtracja</span>
+      </div>
+      <pre><span class="var">oceny</span> <span class="op">=</span> [<span class="nm">4</span>, <span class="nm">5</span>, <span class="nm">3</span>, <span class="nm">5</span>, <span class="nm">2</span>, <span class="nm">4</span>, <span class="nm">5</span>, <span class="nm">3</span>]
+
+<span class="cm"># Suma ręcznie</span>
+<span class="var">suma</span> <span class="op">=</span> <span class="nm">0</span>
+<span class="kw">for</span> <span class="var">ocena</span> <span class="kw">in</span> <span class="var">oceny</span>:
+    <span class="var">suma</span> <span class="op">+=</span> <span class="var">ocena</span>
+<span class="fn">print</span>(<span class="st">f"Suma ocen: {suma}"</span>)
+<span class="fn">print</span>(<span class="st">f"Średnia: {suma / len(oceny):.2f}"</span>)
+
+<span class="cm"># Filtracja — tylko piątki</span>
+<span class="var">piatki</span> <span class="op">=</span> []
+<span class="kw">for</span> <span class="var">ocena</span> <span class="kw">in</span> <span class="var">oceny</span>:
+    <span class="kw">if</span> <span class="var">ocena</span> <span class="op">==</span> <span class="nm">5</span>:
+        <span class="var">piatki</span>.<span class="fn">append</span>(<span class="var">ocena</span>)
+<span class="fn">print</span>(<span class="st">f"Liczba piątek: {len(piatki)}"</span>)
+
+<span class="cm"># Tabliczka mnożenia 3×3</span>
+<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">1</span>, <span class="nm">4</span>):
+    <span class="kw">for</span> <span class="var">j</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">1</span>, <span class="nm">4</span>):
+        <span class="fn">print</span>(<span class="st">f"{i}×{j}={i*j}"</span>, end<span class="op">=</span><span class="st">"  "</span>)
+    <span class="fn">print</span>()</pre>
+    </div>
+    <div class="output">Suma ocen: 31<br>Średnia: 3.88<br>Liczba piątek: 3<br>1×1=1  1×2=2  1×3=3<br>2×1=2  2×2=4  2×3=6<br>3×1=3  3×2=6  3×3=9</div>
+
+    <h3>Pętla while</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-label">Przykład 4 — while podstawy</span>
+      </div>
+      <pre><span class="cm"># Odliczanie rakiety</span>
+<span class="var">sekunda</span> <span class="op">=</span> <span class="nm">5</span>
+<span class="kw">while</span> <span class="var">sekunda</span> <span class="op">></span> <span class="nm">0</span>:
+    <span class="fn">print</span>(<span class="st">f"  {sekunda}..."</span>)
+    <span class="var">sekunda</span> <span class="op">-=</span> <span class="nm">1</span>
+<span class="fn">print</span>(<span class="st">"  🚀 Start!"</span>)</pre>
+    </div>
+    <div class="output">  5...<br>  4...<br>  3...<br>  2...<br>  1...<br>  🚀 Start!</div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-label">Przykład 5 — while z break i continue</span>
+      </div>
+      <pre><span class="cm"># break — przerywa pętlę</span>
+<span class="var">n</span> <span class="op">=</span> <span class="nm">0</span>
+<span class="kw">while</span> <span class="bo">True</span>:              <span class="cm"># nieskończona pętla</span>
+    <span class="kw">if</span> <span class="var">n</span> <span class="op">==</span> <span class="nm">3</span>:
+        <span class="kw">break</span>             <span class="cm"># zatrzymaj przy n=3</span>
+    <span class="fn">print</span>(<span class="st">f"n = {n}"</span>)
+    <span class="var">n</span> <span class="op">+=</span> <span class="nm">1</span>
+<span class="fn">print</span>(<span class="st">"Pętla przerwana"</span>)
+
+<span class="fn">print</span>(<span class="st">"---"</span>)
+
+<span class="cm"># continue — pomija resztę iteracji</span>
+<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">1</span>, <span class="nm">8</span>):
+    <span class="kw">if</span> <span class="var">i</span> <span class="op">%</span> <span class="nm">2</span> <span class="op">==</span> <span class="nm">0</span>:
+        <span class="kw">continue</span>          <span class="cm"># pomiń parzyste</span>
+    <span class="fn">print</span>(<span class="st">f"  nieparzyste: {i}"</span>)</pre>
+    </div>
+    <div class="output">n = 0<br>n = 1<br>n = 2<br>Pętla przerwana<br>---<br>  nieparzyste: 1, 3, 5, 7</div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     ROZDZIAŁ 5 — FUNKCJE
+══════════════════════════════════════════ -->
+<div id="funkcje">
+  <div class="chapter">
+    <div>
+      <div class="chapter-num">Rozdział 05</div>
+      <h2>Funkcje</h2>
+    </div>
+  </div>
+
+  <div class="section">
+    <p>Funkcja to blok kodu z nazwą, który można wywołać wielokrotnie. Pozwala unikać powtórzeń i dzielić program na logiczne części.</p>
+
+    <h3>Funkcje bez parametrów i bez zwracania</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-label">Przykład 1 — prosta funkcja</span>
+      </div>
+      <pre><span class="kw">def</span> <span class="fn">przywitaj</span>():
+    <span class="fn">print</span>(<span class="st">"Cześć! Witaj w kursie Pythona 🐍"</span>)
+    <span class="fn">print</span>(<span class="st">"Zaczynamy naukę!"</span>)
+
+<span class="cm"># Wywołanie funkcji</span>
+<span class="fn">przywitaj</span>()
+<span class="fn">przywitaj</span>()  <span class="cm"># można wiele razy</span></pre>
+    </div>
+    <div class="output">Cześć! Witaj w kursie Pythona 🐍<br>Zaczynamy naukę!<br>Cześć! Witaj w kursie Pythona 🐍<br>Zaczynamy naukę!</div>
+
+    <h3>Funkcje z parametrami</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-label">Przykład 2 — parametry</span>
+      </div>
+      <pre><span class="kw">def</span> <span class="fn">przywitaj_osobę</span>(<span class="var">imie</span>, <span class="var">godz</span>):
+    <span class="kw">if</span> <span class="var">godz</span> <span class="op"><</span> <span class="nm">12</span>:
+        <span class="var">pora</span> <span class="op">=</span> <span class="st">"Dzień dobry"</span>
+    <span class="kw">elif</span> <span class="var">godz</span> <span class="op"><</span> <span class="nm">18</span>:
+        <span class="var">pora</span> <span class="op">=</span> <span class="st">"Dobry wieczór"</span>
+    <span class="kw">else</span>:
+        <span class="var">pora</span> <span class="op">=</span> <span class="st">"Dobranoc"</span>
+    <span class="fn">print</span>(<span class="st">f"{pora}, {imie}!"</span>)
+
+<span class="fn">przywitaj_osobę</span>(<span class="st">"Ania"</span>, <span class="nm">9</span>)
+<span class="fn">przywitaj_osobę</span>(<span class="st">"Bartek"</span>, <span class="nm">15</span>)
+<span class="fn">przywitaj_osobę</span>(<span class="st">"Zosia"</span>, <span class="nm">21</span>)</pre>
+    </div>
+    <div class="output">Dzień dobry, Ania!<br>Dobry wieczór, Bartek!<br>Dobranoc, Zosia!</div>
+
+    <h3>Funkcje zwracające wartości (return)</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-label">Przykład 3 — return</span>
+      </div>
+      <pre><span class="kw">def</span> <span class="fn">dodaj</span>(<span class="var">a</span>, <span class="var">b</span>):
+    <span class="kw">return</span> <span class="var">a</span> <span class="op">+</span> <span class="var">b</span>
+
+<span class="kw">def</span> <span class="fn">pole_prostokata</span>(<span class="var">dl</span>, <span class="var">szer</span>):
+    <span class="kw">return</span> <span class="var">dl</span> <span class="op">*</span> <span class="var">szer</span>
+
+<span class="kw">def</span> <span class="fn">bmi</span>(<span class="var">masa</span>, <span class="var">wzrost</span>):
+    <span class="var">wynik</span> <span class="op">=</span> <span class="var">masa</span> <span class="op">/</span> (<span class="var">wzrost</span> <span class="op">**</span> <span class="nm">2</span>)
+    <span class="kw">return</span> <span class="fn">round</span>(<span class="var">wynik</span>, <span class="nm">2</span>)
+
+<span class="cm"># Używamy wyników funkcji</span>
+<span class="var">suma</span>  <span class="op">=</span> <span class="fn">dodaj</span>(<span class="nm">7</span>, <span class="nm">13</span>)
+<span class="var">pole</span>  <span class="op">=</span> <span class="fn">pole_prostokata</span>(<span class="nm">5</span>, <span class="nm">8</span>)
+<span class="var">moje_bmi</span> <span class="op">=</span> <span class="fn">bmi</span>(<span class="nm">75</span>, <span class="nm">1.80</span>)
+
+<span class="fn">print</span>(<span class="st">f"Suma: {suma}"</span>)
+<span class="fn">print</span>(<span class="st">f"Pole: {pole} m²"</span>)
+<span class="fn">print</span>(<span class="st">f"BMI: {moje_bmi}"</span>)</pre>
+    </div>
+    <div class="output">Suma: 20<br>Pole: 40 m²<br>BMI: 23.15</div>
+
+    <h3>Parametry domyślne i keyword arguments</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-label">Przykład 4 — default args</span>
+      </div>
+      <pre><span class="kw">def</span> <span class="fn">zamów_kawę</span>(<span class="var">rodzaj</span><span class="op">=</span><span class="st">"espresso"</span>, <span class="var">rozmiar</span><span class="op">=</span><span class="st">"M"</span>, <span class="var">mleko</span><span class="op">=</span><span class="bo">False</span>):
+    <span class="var">mleko_txt</span> <span class="op">=</span> <span class="st">" z mlekiem"</span> <span class="kw">if</span> <span class="var">mleko</span> <span class="kw">else</span> <span class="st">""</span>
+    <span class="fn">print</span>(<span class="st">f"☕ {rozmiar} {rodzaj}{mleko_txt}"</span>)
+
+<span class="fn">zamów_kawę</span>()                              <span class="cm"># domyślne wartości</span>
+<span class="fn">zamów_kawę</span>(<span class="st">"latte"</span>, <span class="st">"L"</span>, <span class="bo">True</span>)           <span class="cm"># wszystko ręcznie</span>
+<span class="fn">zamów_kawę</span>(<span class="var">mleko</span><span class="op">=</span><span class="bo">True</span>)                    <span class="cm"># tylko mleko zmienione</span>
+<span class="fn">zamów_kawę</span>(<span class="var">rodzaj</span><span class="op">=</span><span class="st">"cappuccino"</span>, <span class="var">rozmiar</span><span class="op">=</span><span class="st">"S"</span>) <span class="cm"># keyword args</span></pre>
+    </div>
+    <div class="output">☕ M espresso<br>☕ L latte z mlekiem<br>☕ M espresso z mlekiem<br>☕ S cappuccino</div>
+
+    <h3>Zwracanie wielu wartości</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-label">Przykład 5 — multi return</span>
+      </div>
+      <pre><span class="kw">def</span> <span class="fn">statystyki</span>(<span class="var">lista</span>):
+    <span class="var">minimum</span>  <span class="op">=</span> <span class="fn">min</span>(<span class="var">lista</span>)
+    <span class="var">maksimum</span> <span class="op">=</span> <span class="fn">max</span>(<span class="var">lista</span>)
+    <span class="var">srednia</span>  <span class="op">=</span> <span class="fn">sum</span>(<span class="var">lista</span>) <span class="op">/</span> <span class="fn">len</span>(<span class="var">lista</span>)
+    <span class="kw">return</span> <span class="var">minimum</span>, <span class="var">maksimum</span>, <span class="fn">round</span>(<span class="var">srednia</span>, <span class="nm">2</span>)
+
+<span class="var">dane</span> <span class="op">=</span> [<span class="nm">12</span>, <span class="nm">45</span>, <span class="nm">7</span>, <span class="nm">89</span>, <span class="nm">33</span>, <span class="nm">21</span>]
+<span class="var">mn</span>, <span class="var">mx</span>, <span class="var">sr</span> <span class="op">=</span> <span class="fn">statystyki</span>(<span class="var">dane</span>)   <span class="cm"># rozpakowanie krotki</span>
+
+<span class="fn">print</span>(<span class="st">f"Min: {mn}, Max: {mx}, Śr: {sr}"</span>)</pre>
+    </div>
+    <div class="output">Min: 7, Max: 89, Śr: 34.5</div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     ROZDZIAŁ 6 — LISTY
+══════════════════════════════════════════ -->
+<div id="listy">
+  <div class="chapter">
+    <div>
+      <div class="chapter-num">Rozdział 06</div>
+      <h2>Listy (tablice)</h2>
+    </div>
+  </div>
+
+  <div class="section">
+    <p>Lista to uporządkowana kolekcja elementów. Może zawierać dowolne typy danych, można ją modyfikować, a elementy są dostępne przez indeks (od 0).</p>
+
+    <h3>Tworzenie i dostęp do elementów</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-label">Indeksowanie i slicing</span>
+      </div>
+      <pre><span class="var">kolory</span> <span class="op">=</span> [<span class="st">"czerwony"</span>, <span class="st">"zielony"</span>, <span class="st">"niebieski"</span>, <span class="st">"żółty"</span>, <span class="st">"fioletowy"</span>]
+
+<span class="fn">print</span>(<span class="var">kolory</span>[<span class="nm">0</span>])    <span class="cm"># czerwony  (pierwszy)</span>
+<span class="fn">print</span>(<span class="var">kolory</span>[<span class="nm">2</span>])    <span class="cm"># niebieski (trzeci)</span>
+<span class="fn">print</span>(<span class="var">kolory</span>[<span class="op">-</span><span class="nm">1</span>])   <span class="cm"># fioletowy (ostatni)</span>
+<span class="fn">print</span>(<span class="var">kolory</span>[<span class="op">-</span><span class="nm">2</span>])   <span class="cm"># żółty (przedostatni)</span>
+
+<span class="cm"># Slicing [start:stop:krok]</span>
+<span class="fn">print</span>(<span class="var">kolory</span>[<span class="nm">1</span>:<span class="nm">4</span>])    <span class="cm"># [zielony, niebieski, żółty]</span>
+<span class="fn">print</span>(<span class="var">kolory</span>[:<span class="nm">3</span>])     <span class="cm"># [czerwony, zielony, niebieski]</span>
+<span class="fn">print</span>(<span class="var">kolory</span>[<span class="nm">2</span>:])     <span class="cm"># [niebieski, żółty, fioletowy]</span>
+<span class="fn">print</span>(<span class="var">kolory</span>[::<span class="op">-</span><span class="nm">1</span>])   <span class="cm"># odwrócona lista</span></pre>
+    </div>
+    <div class="output">czerwony<br>niebieski<br>fioletowy<br>żółty<br>['zielony', 'niebieski', 'żółty']<br>['czerwony', 'zielony', 'niebieski']<br>['niebieski', 'żółty', 'fioletowy']<br>['fioletowy', 'żółty', 'niebieski', 'zielony', 'czerwony']</div>
+
+    <h3>Metody listy</h3>
+    <table>
+      <tr><th>Metoda</th><th>Opis</th><th>Przykład</th></tr>
+      <tr><td>append(x)</td><td class="desc">Dodaje na końcu</td><td>lst.append(5)</td></tr>
+      <tr><td>insert(i, x)</td><td class="desc">Wstawia na pozycję i</td><td>lst.insert(1, "a")</td></tr>
+      <tr><td>remove(x)</td><td class="desc">Usuwa pierwsze x</td><td>lst.remove(5)</td></tr>
+      <tr><td>pop(i)</td><td class="desc">Usuwa i zwraca element</td><td>lst.pop(-1)</td></tr>
+      <tr><td>sort()</td><td class="desc">Sortuje w miejscu</td><td>lst.sort()</td></tr>
+      <tr><td>reverse()</td><td class="desc">Odwraca w miejscu</td><td>lst.reverse()</td></tr>
+      <tr><td>index(x)</td><td class="desc">Indeks pierwszego x</td><td>lst.index(5)</td></tr>
+      <tr><td>count(x)</td><td class="desc">Ile razy x wystąpił</td><td>lst.count(5)</td></tr>
+      <tr><td>copy()</td><td class="desc">Płytka kopia</td><td>lst2 = lst.copy()</td></tr>
+      <tr><td>clear()</td><td class="desc">Czyści listę</td><td>lst.clear()</td></tr>
+      <tr><td>extend(lst2)</td><td class="desc">Dodaje elementy z lst2</td><td>lst.extend([1,2])</td></tr>
+    </table>
+
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-label">Metody w praktyce</span>
+      </div>
+      <pre><span class="var">zakupy</span> <span class="op">=</span> [<span class="st">"mleko"</span>, <span class="st">"chleb"</span>, <span class="st">"masło"</span>]
+
+<span class="cm"># Dodawanie</span>
+<span class="var">zakupy</span>.<span class="fn">append</span>(<span class="st">"ser"</span>)           <span class="cm"># na koniec</span>
+<span class="var">zakupy</span>.<span class="fn">insert</span>(<span class="nm">1</span>, <span class="st">"jajka"</span>)      <span class="cm"># na pozycję 1</span>
+<span class="fn">print</span>(<span class="var">zakupy</span>)
+
+<span class="cm"># Usuwanie</span>
+<span class="var">zakupy</span>.<span class="fn">remove</span>(<span class="st">"masło"</span>)        <span class="cm"># po wartości</span>
+<span class="var">ostatni</span> <span class="op">=</span> <span class="var">zakupy</span>.<span class="fn">pop</span>()        <span class="cm"># zdejmij ostatni</span>
+<span class="fn">print</span>(<span class="st">f"Zdjęto: {ostatni}"</span>)
+<span class="fn">print</span>(<span class="var">zakupy</span>)
+
+<span class="cm"># Sortowanie</span>
+<span class="var">liczby</span> <span class="op">=</span> [<span class="nm">5</span>, <span class="nm">1</span>, <span class="nm">9</span>, <span class="nm">3</span>, <span class="nm">7</span>, <span class="nm">2</span>]
+<span class="var">liczby</span>.<span class="fn">sort</span>()
+<span class="fn">print</span>(<span class="var">liczby</span>)                  <span class="cm"># rosnąco</span>
+<span class="var">liczby</span>.<span class="fn">sort</span>(reverse<span class="op">=</span><span class="bo">True</span>)
+<span class="fn">print</span>(<span class="var">liczby</span>)                  <span class="cm"># malejąco</span>
+
+<span class="cm"># Przydatne funkcje wbudowane na listach</span>
+<span class="fn">print</span>(<span class="st">f"Min: {min(liczby)}, Max: {max(liczby)}, Suma: {sum(liczby)}"</span>)
+<span class="fn">print</span>(<span class="st">f"Długość: {len(liczby)}"</span>)</pre>
+    </div>
+    <div class="output">['mleko', 'jajka', 'chleb', 'masło', 'ser']<br>Zdjęto: ser<br>['mleko', 'jajka', 'chleb']<br>[1, 2, 3, 5, 7, 9]<br>[9, 7, 5, 3, 2, 1]<br>Min: 1, Max: 9, Suma: 27<br>Długość: 6</div>
+
+    <h3>Lista dwuwymiarowa (tablica 2D)</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-label">Macierz / siatka</span>
+      </div>
+      <pre><span class="cm"># Macierz 3x3</span>
+<span class="var">macierz</span> <span class="op">=</span> [
+    [<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>],
+    [<span class="nm">4</span>, <span class="nm">5</span>, <span class="nm">6</span>],
+    [<span class="nm">7</span>, <span class="nm">8</span>, <span class="nm">9</span>]
+]
+
+<span class="fn">print</span>(<span class="var">macierz</span>[<span class="nm">0</span>][<span class="nm">1</span>])   <span class="cm"># 2 (rząd 0, kolumna 1)</span>
+<span class="fn">print</span>(<span class="var">macierz</span>[<span class="nm">2</span>][<span class="nm">2</span>])   <span class="cm"># 9 (rząd 2, kolumna 2)</span>
+
+<span class="cm"># Iteracja po macierzy</span>
+<span class="kw">for</span> <span class="var">rzad</span> <span class="kw">in</span> <span class="var">macierz</span>:
+    <span class="kw">for</span> <span class="var">elem</span> <span class="kw">in</span> <span class="var">rzad</span>:
+        <span class="fn">print</span>(<span class="st">f"{elem:2}"</span>, end<span class="op">=</span><span class="st">" "</span>)
+    <span class="fn">print</span>()
+
+<span class="cm"># Suma przekątnej</span>
+<span class="var">przekatna</span> <span class="op">=</span> <span class="fn">sum</span>(<span class="var">macierz</span>[<span class="var">i</span>][<span class="var">i</span>] <span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">3</span>))
+<span class="fn">print</span>(<span class="st">f"Suma przekątnej: {przekatna}"</span>)</pre>
+    </div>
+    <div class="output">2<br>9<br> 1  2  3<br> 4  5  6<br> 7  8  9<br>Suma przekątnej: 15</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     ROZDZIAŁ 7 — FUNKCJE MATEMATYCZNE
+══════════════════════════════════════════ -->
+<div id="math">
+  <div class="chapter">
+    <div>
+      <div class="chapter-num">Rozdział 07</div>
+      <h2>Funkcje matematyczne</h2>
+    </div>
+  </div>
+
+  <div class="section">
+    <p>Python dostarcza wbudowane funkcje matematyczne. Dla bardziej zaawansowanych operacji importujemy moduł <span class="tag">math</span>.</p>
+
+    <h3>Funkcje wbudowane</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-label">Built-in math</span>
+      </div>
+      <pre><span class="fn">print</span>(<span class="fn">abs</span>(<span class="op">-</span><span class="nm">15</span>))           <span class="cm"># wartość bezwzględna → 15</span>
+<span class="fn">print</span>(<span class="fn">round</span>(<span class="nm">3.7</span>))          <span class="cm"># zaokrąglenie → 4</span>
+<span class="fn">print</span>(<span class="fn">round</span>(<span class="nm">3.14159</span>, <span class="nm">2</span>))  <span class="cm"># 2 miejsca → 3.14</span>
+<span class="fn">print</span>(<span class="fn">pow</span>(<span class="nm">2</span>, <span class="nm">10</span>))          <span class="cm"># potęga → 1024</span>
+<span class="fn">print</span>(<span class="fn">max</span>(<span class="nm">3</span>, <span class="nm">7</span>, <span class="nm">1</span>, <span class="nm">9</span>, <span class="nm">4</span>))  <span class="cm"># maksimum → 9</span>
+<span class="fn">print</span>(<span class="fn">min</span>(<span class="nm">3</span>, <span class="nm">7</span>, <span class="nm">1</span>, <span class="nm">9</span>, <span class="nm">4</span>))  <span class="cm"># minimum → 1</span>
+<span class="fn">print</span>(<span class="fn">sum</span>([<span class="nm">1</span>,<span class="nm">2</span>,<span class="nm">3</span>,<span class="nm">4</span>,<span class="nm">5</span>]))    <span class="cm"># suma → 15</span>
+<span class="fn">print</span>(<span class="fn">divmod</span>(<span class="nm">17</span>, <span class="nm">5</span>))       <span class="cm"># (iloraz, reszta) → (3, 2)</span></pre>
+    </div>
+    <div class="output">15<br>4<br>3.14<br>1024<br>9<br>1<br>15<br>(3, 2)</div>
+
+    <h3>Moduł math</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-label">import math</span>
+      </div>
+      <pre><span class="kw">import</span> <span class="var">math</span>
+
+<span class="cm"># Stałe</span>
+<span class="fn">print</span>(<span class="var">math</span>.<span class="var">pi</span>)          <span class="cm"># π = 3.14159…</span>
+<span class="fn">print</span>(<span class="var">math</span>.<span class="var">e</span>)           <span class="cm"># e = 2.71828…</span>
+<span class="fn">print</span>(<span class="var">math</span>.<span class="var">tau</span>)         <span class="cm"># τ = 2π = 6.28318…</span>
+
+<span class="cm"># Zaokrąglanie</span>
+<span class="fn">print</span>(<span class="var">math</span>.<span class="fn">floor</span>(<span class="nm">3.9</span>))  <span class="cm"># zaokrągl w dół → 3</span>
+<span class="fn">print</span>(<span class="var">math</span>.<span class="fn">ceil</span>(<span class="nm">3.1</span>))   <span class="cm"># zaokrągl w górę → 4</span>
+
+<span class="cm"># Pierwiastek i logarytm</span>
+<span class="fn">print</span>(<span class="var">math</span>.<span class="fn">sqrt</span>(<span class="nm">144</span>))   <span class="cm"># pierwiastek → 12.0</span>
+<span class="fn">print</span>(<span class="var">math</span>.<span class="fn">log</span>(<span class="nm">100</span>, <span class="nm">10</span>)) <span class="cm"># log₁₀(100) → 2.0</span>
+<span class="fn">print</span>(<span class="var">math</span>.<span class="fn">log2</span>(<span class="nm">64</span>))    <span class="cm"># log₂(64) → 6.0</span>
+
+<span class="cm"># Trygonometria (argumenty w radianach)</span>
+<span class="fn">print</span>(<span class="fn">round</span>(<span class="var">math</span>.<span class="fn">sin</span>(<span class="var">math</span>.<span class="var">pi</span> <span class="op">/</span> <span class="nm">2</span>), <span class="nm">2</span>))  <span class="cm"># sin(90°) → 1.0</span>
+<span class="fn">print</span>(<span class="fn">round</span>(<span class="var">math</span>.<span class="fn">cos</span>(<span class="nm">0</span>), <span class="nm">2</span>))             <span class="cm"># cos(0°) → 1.0</span>
+
+<span class="cm"># Silnia i kombinatoryka</span>
+<span class="fn">print</span>(<span class="var">math</span>.<span class="fn">factorial</span>(<span class="nm">6</span>))  <span class="cm"># 6! = 720</span>
+<span class="fn">print</span>(<span class="var">math</span>.<span class="fn">comb</span>(<span class="nm">10</span>, <span class="nm">3</span>))   <span class="cm"># C(10,3) = 120</span>
+<span class="fn">print</span>(<span class="var">math</span>.<span class="fn">perm</span>(<span class="nm">5</span>, <span class="nm">2</span>))    <span class="cm"># P(5,2) = 20</span></pre>
+    </div>
+    <div class="output">3.141592653589793<br>2.718281828459045<br>6.283185307179586<br>3<br>4<br>12.0<br>2.0<br>6.0<br>1.0<br>1.0<br>720<br>120<br>20</div>
+
+    <h3>Przykład praktyczny — kalkulator geometryczny</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-label">Geometria z math</span>
+      </div>
+      <pre><span class="kw">import</span> <span class="var">math</span>
+
+<span class="kw">def</span> <span class="fn">pole_kola</span>(<span class="var">r</span>):
+    <span class="kw">return</span> <span class="fn">round</span>(<span class="var">math</span>.<span class="var">pi</span> <span class="op">*</span> <span class="var">r</span> <span class="op">**</span> <span class="nm">2</span>, <span class="nm">4</span>)
+
+<span class="kw">def</span> <span class="fn">obwod_kola</span>(<span class="var">r</span>):
+    <span class="kw">return</span> <span class="fn">round</span>(<span class="nm">2</span> <span class="op">*</span> <span class="var">math</span>.<span class="var">pi</span> <span class="op">*</span> <span class="var">r</span>, <span class="nm">4</span>)
+
+<span class="kw">def</span> <span class="fn">przeciwprostokatna</span>(<span class="var">a</span>, <span class="var">b</span>):
+    <span class="kw">return</span> <span class="fn">round</span>(<span class="var">math</span>.<span class="fn">sqrt</span>(<span class="var">a</span><span class="op">**</span><span class="nm">2</span> <span class="op">+</span> <span class="var">b</span><span class="op">**</span><span class="nm">2</span>), <span class="nm">4</span>)
+
+<span class="cm"># Wyniki</span>
+<span class="fn">print</span>(<span class="st">f"Koło r=5:  pole={pole_kola(5)}, obwód={obwod_kola(5)}"</span>)
+<span class="fn">print</span>(<span class="st">f"Trójkąt 3-4-?: c = {przeciwprostokatna(3, 4)}"</span>)
+
+<span class="cm"># Kąty stopień → radian</span>
+<span class="kw">for</span> <span class="var">stopnie</span> <span class="kw">in</span> [<span class="nm">0</span>, <span class="nm">30</span>, <span class="nm">45</span>, <span class="nm">60</span>, <span class="nm">90</span>]:
+    <span class="var">rad</span> <span class="op">=</span> <span class="var">math</span>.<span class="fn">radians</span>(<span class="var">stopnie</span>)
+    <span class="fn">print</span>(<span class="st">f"  sin({stopnie:2}°) = {math.sin(rad):.4f}"</span>)</pre>
+    </div>
+    <div class="output">Koło r=5:  pole=78.5398, obwód=31.4159<br>Trójkąt 3-4-?: c = 5.0<br>  sin( 0°) = 0.0000<br>  sin(30°) = 0.5000<br>  sin(45°) = 0.7071<br>  sin(60°) = 0.8660<br>  sin(90°) = 1.0000</div>
+
+    <h3>Moduł random</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><span></span><span></span><span></span></div>
+        <span class="code-label">import random</span>
+      </div>
+      <pre><span class="kw">import</span> <span class="var">random</span>
+
+<span class="fn">print</span>(<span class="var">random</span>.<span class="fn">random</span>())           <span class="cm"># float [0.0, 1.0)</span>
+<span class="fn">print</span>(<span class="var">random</span>.<span class="fn">randint</span>(<span class="nm">1</span>, <span class="nm">100</span>))   <span class="cm"># int między 1 a 100</span>
+<span class="fn">print</span>(<span class="var">random</span>.<span class="fn">uniform</span>(<span class="nm">1.5</span>, <span class="nm">5.5</span>)) <span class="cm"># float między 1.5 a 5.5</span>
+
+<span class="var">karty</span> <span class="op">=</span> [<span class="st">"♠A"</span>, <span class="st">"♥K"</span>, <span class="st">"♦Q"</span>, <span class="st">"♣J"</span>, <span class="st">"♠10"</span>]
+<span class="fn">print</span>(<span class="var">random</span>.<span class="fn">choice</span>(<span class="var">karty</span>))     <span class="cm"># losowa karta</span>
+<span class="var">random</span>.<span class="fn">shuffle</span>(<span class="var">karty</span>)           <span class="cm"># potasuj</span>
+<span class="fn">print</span>(<span class="var">karty</span>)
+<span class="fn">print</span>(<span class="var">random</span>.<span class="fn">sample</span>(<span class="var">karty</span>, <span class="nm">2</span>))  <span class="cm"># 2 unikalne losowe</span></pre>
+    </div>
+    <div class="output">0.7342…<br>57<br>3.841…<br>♦Q<br>['♣J', '♠A', '♦Q', '♠10', '♥K']<br>['♠10', '♣J']</div>
+
+    <div class="info-box">
+      <strong>🎯 Co dalej?</strong>
+      Masz opanowane podstawy Pythona! Kolejne kroki: słowniki i krotki, klasy i OOP, obsługa plików, wyjątki (try/except), biblioteki jak NumPy, Pandas i wiele więcej.
+    </div>
+
+  </div>
+</div>
+
+  </div><!-- /content -->
+</main>
+
+<script>
+  // Active nav highlight on scroll
+  const sections = document.querySelectorAll('[id]');
+  const navLinks = document.querySelectorAll('.sidebar a');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(a => a.classList.remove('active'));
+        const active = document.querySelector(`.sidebar a[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -60% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+
+  // Close sidebar on mobile link click
+  document.querySelectorAll('.sidebar a').forEach(a => {
+    a.addEventListener('click', () => {
+      document.querySelector('.sidebar').classList.remove('open');
+    });
+  });
+</script>
+</body>
+</html>
